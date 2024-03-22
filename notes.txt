@@ -1,0 +1,33 @@
+Add start game lobby endpoint
+have all players get rerouted to /game/x from /lobby/x
+not adding people to lobby group with right group number? seems to be deleted in
+start game handler. 
+
+
+Just remove the lobby/group part of key. use only lobby id to control the
+broadcasting. Too much fuss with leaving the lobby group and joining the game
+group. anyone in that group will want the update anyways, might as well make it
+uniform. 
+
+need to call /leavelobby when navigating away from lobby page. call on dismount
+
+Change structure to include websocket subscription system. Clients connect in the relevant component - lobby/game etc. They subscribe to the lobby id, or lobby list, or game. the backend emits messages to the relevant subscribers. no need for a websocket context and massively scoped state. no need for the backend to remember whos in what lobby.
+
+
+Use bridge between connection and lobby manager to do the actual function calls.
+this should sync actions between the two. joining a lobby will add the right
+topic sub, and then use the connection manager to send the new json info out.
+
+Why?
+this will decouple the async/sync actions so that all the connection manager
+does is sub/unsub, and send messages to actively connected users. then the
+disconnect functionality can be synchronous - and we won't unsubscribe users out
+of order if the disconnect.
+Seems good to have the coupling between lobby+connection managers moved into
+their own unit. 
+
+to update:
+request lobbies websocket message
+unsubscribe lobby list ws msg
+
+adding ws connections and subscriptions to mount/dismount of route components. 
